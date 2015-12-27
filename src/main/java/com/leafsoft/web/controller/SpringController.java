@@ -9,15 +9,21 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.leafsoft.dao.impl.JdbcUserDAO;
 import com.leafsoft.model.LeafUser;
+import com.leafsoft.util.JdbcUtil;
 import com.leafsoft.util.UserUtil;
 
 @Controller
@@ -103,19 +109,31 @@ public class SpringController {
 		}
 		
 		@RequestMapping(value = "/loginUsers", method = RequestMethod.GET)
-		public void loginUsers(HttpServletRequest req,HttpServletResponse res) {
-			ModelAndView model = new ModelAndView();
-			LeafUser user = UserUtil.getCurrentUser();
-			List<Object> principals = sessionRegistry.getAllPrincipals();
-
-			List<String> usersNamesList = new ArrayList<String>();
-
-			for (Object principal: principals) {
-			    if (principal instanceof User) {
-			        usersNamesList.add(((User) principal).getUsername());
-			    }
+		@ResponseBody
+		public String loginUsers(HttpServletRequest req,HttpServletResponse res) {
+			String sessionId = req.getRequestedSessionId();
+			System.out.print("sessionId;:"+sessionId);
+			JSONObject resJson = new JSONObject();
+			if(sessionId!=null) {
+			//List<Object> principals = sessionRegistry.getAllPrincipals();
+			SessionInformation sessioninfo = sessionRegistry.getSessionInformation(sessionId);
+				if(sessioninfo!= null) {
+					String userName =((User) sessioninfo.getPrincipal()).getUsername();
+					DriverManagerDataSource datasource = new JdbcUtil().getAccountsDataSource();
+			        // Inject the datasource into the dao
+			    	JdbcUserDAO userDAO = new JdbcUserDAO();
+			    	userDAO.setDataSource(datasource);
+			    	LeafUser user = userDAO.loadUserByUsername(userName);
+			    	resJson = new JSONObject();
+			    	resJson.put("lid", user.getLid());
+			    	resJson.put("username", user.getUsername());
+			    	resJson.put("enabled", user.getEnabled());
+			    	resJson.put("email", user.getEmail());
+			    	resJson.put("dob", user.getDob());
+				}
 			}
-			System.out.print("registry"+usersNamesList);
+	    	return resJson.toString();
+	    	
 
 		}
 

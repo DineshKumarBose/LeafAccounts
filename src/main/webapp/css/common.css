@@ -40,6 +40,20 @@
 	margin-bottom:8px;
 	font-family:tahoma, arial, sans-serif;
 }
+/* Gradient 1 */
+.ta10 {
+	background-image:url(images/form_bg.jpg);
+	background-repeat:repeat-x;
+	border:1px solid #d1c7ac;
+	width: 230px;
+	height: 60px;
+	color:#333333;
+	padding:3px;
+	margin-right:4px;
+	margin-bottom:8px;
+	font-family:tahoma, arial, sans-serif;
+
+}
 /* Rounded Corners */
 .fb8 {
 	border: 2px solid #777;

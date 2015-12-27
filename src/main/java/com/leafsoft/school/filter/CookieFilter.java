@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
-import com.leafsoft.org.OrgUtil;
 import com.leafsoft.util.UserUtil;
 
 public class CookieFilter implements Filter {
@@ -34,18 +33,15 @@ public class CookieFilter implements Filter {
 			HttpServletRequest request = (HttpServletRequest) req;
 			HttpServletResponse response = (HttpServletResponse) res;
 			//specifying name and value of the cookie
-			  Cookie cookie = new Cookie("JSESSIONID", request.getSession(true).getId());
-			  String domainName = request.getServerName(); //Gives www.xyz.com in our example
-			  //String domainNamePrefix = domainName.substring(domainName.indexOf("."), domainName.length()); //Returns .xyz.com
-			  //Specifies the domain within which this cookie should be presented.
-			  cookie.setDomain("leafsoft");
-			  response.addCookie(cookie);
 			LOGGER.log(Level.INFO,"Filter:::::ip:"+request.getRemoteAddr());
+			LOGGER.log(Level.INFO,"server:::::ip:"+request.getUserPrincipal());
+			if(request.getUserPrincipal()!=null) {
+				LOGGER.log(Level.INFO,"server:::::ip:"+request.getUserPrincipal().getName());
+			}
 			fc.doFilter(req, res);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			OrgUtil.cleanup();
 		}
 	}
 

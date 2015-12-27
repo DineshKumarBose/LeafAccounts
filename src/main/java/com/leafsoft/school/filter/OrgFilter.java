@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.leafsoft.org.OrgUtil;
 import com.leafsoft.util.UserUtil;
 
 public class OrgFilter implements Filter {
@@ -32,16 +31,15 @@ public class OrgFilter implements Filter {
 		try {
 			HttpServletRequest request = (HttpServletRequest) req;
 			String path = request.getRequestURI();
-			String serviceName = path.substring(path.lastIndexOf("/")+1, path.indexOf("."));
-			OrgUtil.setRemoteuseripaddress(req.getRemoteAddr());
-			OrgUtil.setUser(UserUtil.getCurrentUser());
-			OrgUtil.setUserlid(UserUtil.getCurrentUser().getLid());
+			//String serviceName = path.substring(path.lastIndexOf("/")+1, path.indexOf("."));
+			String header = request.getHeader("SM_USER");
+			LOGGER.log(Level.INFO,"Filter:::::ip:"+header);
 			LOGGER.log(Level.INFO,"Filter:::::ip:"+request.getRemoteAddr());
 			fc.doFilter(req, res);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			OrgUtil.cleanup();
+			
 		}
 	}
 

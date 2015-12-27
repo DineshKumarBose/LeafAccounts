@@ -16,13 +16,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.json.JSONObject;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 
 import com.leafsoft.http.HttpConstants;
-import com.leafsoft.model.LeafUser;
-import com.leafsoft.org.OrgUtil;
 import com.leafsoft.urlutilitis.util.UrlUtilititisUtil;
 import com.leafsoft.urlutilitis.util.urlutilitisConstants;
 import com.leafsoft.util.Constants;
@@ -56,8 +51,6 @@ public class UrlUtiltiesAction extends DispatchAction{
 			throws Exception {
 		try{
 		LOGGER.log(Level.INFO,"LID::::::"+UserUtil.getCurrentUser().getLid());
-		LOGGER.log(Level.INFO,"getRemoteuseripaddress::::"+OrgUtil.getRemoteuseripaddress());
-		LOGGER.log(Level.INFO,"userid::::"+OrgUtil.getUserlid());
 		String url = request.getParameter("url").trim();
 		response.setContentType(HttpConstants.JSON_CONTENT_TYPE);//No I18N
 		JSONObject encodeJson = new JSONObject();
@@ -75,6 +68,24 @@ public class UrlUtiltiesAction extends DispatchAction{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		LOGGER.log(Level.INFO,"LID::::::"+UserUtil.getCurrentUser().getLid());
+		try {
+		String url = request.getParameter("url").trim();
+		response.setContentType(HttpConstants.JSON_CONTENT_TYPE);//No I18N
+		JSONObject decodeJson = new JSONObject();
+		String decodedUrl = UrlUtilititisUtil.deCodeUrl(url);
+		decodeJson.put(Constants.RESULT, Constants.SUCCESS);
+		decodeJson.put(urlutilitisConstants.DECODED_URL, decodedUrl);
+		response.getWriter().write(decodeJson.toString());
+		} catch(Exception e) {
+			LOGGER.log(Level.SEVERE,"decodeUrl():::Exception{0}"+e.getMessage(),e);
+		}
+		return null;
+	}
+	
+	public ActionForward getCurrenctUser(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		LOGGER.log(Level.INFO,"LID::::::"+request.getSession());
 		try {
 		String url = request.getParameter("url").trim();
 		response.setContentType(HttpConstants.JSON_CONTENT_TYPE);//No I18N
