@@ -11,6 +11,9 @@
 <body>
 <img src="images/leafsoft.png" alt="LeafSoft">
 <h3>Our Product</h3>
-<ul><a href="urlutility">Url Encoder/Decoder</a></ul>
+<ul>
+<li><a href="urlutility">Url Encoder/Decoder</a></li>
+<li><a href="school">School Management</a></li>
+</ul>
 </body>
 </html>

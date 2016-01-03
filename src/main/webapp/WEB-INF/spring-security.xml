@@ -17,6 +17,7 @@
 		<intercept-url pattern="/forgetPassword" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 		<intercept-url pattern="/resetPassword" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 		<intercept-url pattern="/loginUsers" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<intercept-url pattern="/logoutUsers" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 		<session-management>
     	<concurrency-control session-registry-ref="sessionRegistry"/>
 		</session-management>

@@ -2,15 +2,20 @@ package com.leafsoft.web.controller;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.User;
@@ -30,7 +35,7 @@ import com.leafsoft.util.UserUtil;
 public class SpringController {
 	@Resource(name="sessionRegistry")
 	 private SessionRegistryImpl sessionRegistry;
-
+	private static Logger LOGGER = Logger.getLogger(SpringController.class.getName());
 	@RequestMapping(value = "/welcome", method = RequestMethod.GET)
 	public ModelAndView welcomePage() {
 
@@ -136,5 +141,52 @@ public class SpringController {
 	    	
 
 		}
+		
+		@RequestMapping(value = "/logoutUsers", method = RequestMethod.GET)
+		@ResponseBody
+		public String logoutUsers(HttpServletRequest req,HttpServletResponse res) {
+			String sessionId = req.getRequestedSessionId();
+			System.out.print("sessionId;:"+sessionId);
+			JSONObject resJson = new JSONObject();
+			LOGGER.log(Level.INFO,"EXPIRE SESSION::::::"+sessionId);
+			logout(req);
+			if(sessionId!=null) {
+			//List<Object> principals = sessionRegistry.getAllPrincipals();
+			sessionRegistry.removeSessionInformation(sessionId);
+			if(sessionRegistry.getSessionInformation(sessionId) != null){
+				SessionInformation session = sessionRegistry.getSessionInformation(sessionId);
+				boolean isexpired = sessionRegistry.getSessionInformation(sessionId).isExpired();
+				resJson.put("isexpired",isexpired);
+				if(!isexpired) {
+					sessionRegistry.getSessionInformation(sessionId).expireNow();
+				}
+			}
+			resJson.put("Result",0);
+			resJson.put("msg","Successfully logged out on LeafSchool");
+			}
+	    	return resJson.toString();
+
+		}
+		
+		public static void logout(HttpServletRequest request) {
+			  SecurityContextHolder.getContext().setAuthentication(null);
+			  SecurityContextHolder.clearContext();
+			  HttpSession hs = request.getSession();
+			  Enumeration<String> e = hs.getAttributeNames();
+			  while (e.hasMoreElements()) {
+				  String attr = e.nextElement();
+				  hs.setAttribute(attr, null);
+			  }
+			  		removeCookies(request);
+			  		hs.invalidate();
+			  }
+		  public static void removeCookies(HttpServletRequest request) {
+			  Cookie[] cookies = request.getCookies();
+			  if (cookies != null && cookies.length > 0) {
+				  for (int i = 0; i < cookies.length; i++) {
+					  cookies[i].setMaxAge(0);
+				  }
+			  }
+		  }
 
 }
